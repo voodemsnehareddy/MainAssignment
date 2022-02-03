@@ -2,3 +2,10 @@ http:
   host: "localhost"
   port: "8081"
   path: "getFlights"
+  
+db:
+  host: "localhost"
+  port: "3306"
+  username: "root"
+  password: "root"
+  database: "book_my_holiday"
