@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="41a2055e-b101-4845-aa77-d36a9c42b3fd" >
+		<http:request-connection host="${http.host}" port="${http.port}" />
+	</http:request-config>
+	<flow name="getFlights" doc:id="890f7ced-86b9-4bb8-b0bd-f19e27b9a08e" >
+		<http:listener doc:name="Listener" doc:id="2890acff-42ba-45f1-83a2-44becf58cbb4" config-ref="indigo-flight-system-api-httpListenerConfig" path="{http.path}"/>
+		<logger level="INFO" doc:name="Logger" doc:id="76ec3c52-8327-4789-bf0a-2a26a724b71c" />
+		<flow-ref doc:name="Flow Reference" doc:id="77a90767-62ba-4da2-abd3-e938fbbf0e28" name="getAllFlightsFromDatabase"/>
+		<logger level="INFO" doc:name="Logger" doc:id="6a142907-59ae-4939-a34c-d0271fb4eeea" />
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="06978bc8-e804-428d-a41e-6f49628170e1" >
+				<logger level="INFO" doc:name="Logger" doc:id="49c7f9eb-a9a9-4541-a686-22ab66bfc9a3" message="Error Occured in fetching data"/>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="getAllFlightsFromDatabase" doc:id="58fd24ea-2d8c-42f9-8889-832129268cd1" >
+		<db:select doc:name="Select" doc:id="0a1be06e-f86b-4fe3-bd4b-7b306a202e65" config-ref="Database_Config">
+			<db:sql ><![CDATA[select * from indigo_flights]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="4522edd6-8ae7-4c15-9360-d3903fbb2d96" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
