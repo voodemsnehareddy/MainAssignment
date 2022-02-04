@@ -1,11 +1,11 @@
 http:
   host: "localhost"
-  port: "8082"
-  path: "getFlights"
+  port: "8081"
+  path: "flights"
   
 db:
-  host: "localhost"
+  host: "book-my-holiday.cinqbi7mgai2.us-east-1.rds.amazonaws.com"
   port: "3306"
-  username: "root"
-  password: "root"
+  username: "admin"
+  password: "Apisero2022"
   database: "book_my_holiday"

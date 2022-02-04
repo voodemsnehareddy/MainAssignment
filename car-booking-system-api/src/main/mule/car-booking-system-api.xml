@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:s3="http://www.mulesoft.org/schema/mule/s3"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/s3 http://www.mulesoft.org/schema/mule/s3/current/mule-s3.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="f166fe44-4475-4115-8f02-29eb8dc30743" >
+		<http:listener-connection host="0.0.0.0" port="8082" />
+	</http:listener-config>
+	<s3:config name="Amazon_S3_Configuration" doc:name="Amazon S3 Configuration" doc:id="0cdbd7c8-1821-47d8-8eb6-beb5ebc13e70" >
+		<s3:basic-connection accessKey="AKIASNUHIOGP7FPXS2XZ" secretKey="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" />
+	</s3:config>
+	<flow name="car-booking-system-apiFlow" doc:id="c3154025-d4a9-4149-a3a2-3aeddf46ebf7" >
+		<http:listener doc:name="Listener" doc:id="7a85ab75-2912-4adf-a116-57d1a1f66e51" config-ref="HTTP_Listener_config" path="/cars"/>
+		<logger level="INFO" doc:name="Logger" doc:id="b90e799d-1669-4c10-9589-39a314d90a4a" />
+		<flow-ref doc:name="Flow Reference" doc:id="3b74f5c2-a028-482c-8520-94aaa6b91532" name="fetch-car-details"/>
+		<ee:transform doc:name="Transform Message" doc:id="01d0b510-8362-49f6-8da9-6ccf553f139a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="1ab554b9-a7ba-49b9-9322-08102d4cd837" />
+	</flow>
+	<flow name="fetch-car-details" doc:id="f19ad2ba-56a9-45b3-9fbc-2e1e3ebb61f8" >
+		<scheduler doc:name="Scheduler" doc:id="68b946d4-0e75-4c16-8149-62f340b0808e" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="1" timeUnit="HOURS"/>
+			</scheduling-strategy>
+		</scheduler>
+		<s3:get-object doc:name="Get object" doc:id="d050ee58-b51b-44cd-9cc7-38ccb27c410d" config-ref="Amazon_S3_Configuration" bucketName="snehaassignmentcb" key="Cars_Consolidated_Data.csv" />
+	</flow>
+</mule>
