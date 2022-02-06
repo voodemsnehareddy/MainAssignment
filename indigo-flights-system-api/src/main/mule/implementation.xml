@@ -10,27 +10,81 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 		<http:request-connection host="${http.host}" port="${http.port}" />
 	</http:request-config>
 	<flow name="getFlights" doc:id="890f7ced-86b9-4bb8-b0bd-f19e27b9a08e" >
-		<http:listener doc:name="Listener" doc:id="2890acff-42ba-45f1-83a2-44becf58cbb4" config-ref="indigo-flight-system-api-httpListenerConfig" path="{http.path}"/>
-		<logger level="INFO" doc:name="Logger" doc:id="76ec3c52-8327-4789-bf0a-2a26a724b71c" />
-		<flow-ref doc:name="Flow Reference" doc:id="77a90767-62ba-4da2-abd3-e938fbbf0e28" name="getAllFlightsFromDatabase"/>
-		<logger level="INFO" doc:name="Logger" doc:id="6a142907-59ae-4939-a34c-d0271fb4eeea" />
+		<db:select doc:name="Select" doc:id="0a1be06e-f86b-4fe3-bd4b-7b306a202e65" config-ref="Database_Config">
+			<db:sql><![CDATA[select * from indigo_flights]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="4522edd6-8ae7-4c15-9360-d3903fbb2d96">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	ID: payload01.flight_id,
+	code: payload01.flight_code default "",
+	price: payload01.price default 0,
+	departureDate: payload01.flight_date as String default "",
+	origin: payload01.origin default "",
+	destination: payload01.destination default "",
+	emptySeats: payload01.emptySeats default 0,
+	plane: {
+		"type": payload01.plane_type default "",
+		totalSeats: payload01.total_seats default 0
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
 		<error-handler >
 			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="06978bc8-e804-428d-a41e-6f49628170e1" >
 				<logger level="INFO" doc:name="Logger" doc:id="49c7f9eb-a9a9-4541-a686-22ab66bfc9a3" message="Error Occured in fetching data"/>
 			</on-error-propagate>
 		</error-handler>
 	</flow>
-	<flow name="getAllFlightsFromDatabase" doc:id="58fd24ea-2d8c-42f9-8889-832129268cd1" >
-		<db:select doc:name="Select" doc:id="0a1be06e-f86b-4fe3-bd4b-7b306a202e65" config-ref="Database_Config">
-			<db:sql ><![CDATA[select * from indigo_flights]]></db:sql>
+	<flow name="getFlightsByID" doc:id="ad35c181-4247-4ad7-bb6e-0d744055275e" >
+		<db:select doc:name="Select" doc:id="3e620588-2a13-48d0-880e-e143805ee6c9" config-ref="Database_Config" >
+			<db:sql ><![CDATA[select * from indigo_flights WHERE flight_id = :ID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'ID' : attributes.uriParams.flightId}]]]></db:input-parameters>
 		</db:select>
-		<ee:transform doc:name="Transform Message" doc:id="4522edd6-8ae7-4c15-9360-d3903fbb2d96" >
+		<ee:transform doc:name="Transform Message" doc:id="efde8966-aa26-4241-9f14-6466d30b5a6e" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
 ---
-payload]]></ee:set-payload>
+payload map ( payload01 , indexOfPayload01 ) -> {
+	ID: payload01.flight_id,
+	code: payload01.flight_code default "",
+	price: payload01.price default 0,
+	departureDate: payload01.flight_date as String default "",
+	origin: payload01.origin default "",
+	destination: payload01.destination default "",
+	emptySeats: payload01.emptySeats default 0,
+	plane: {
+		"type": payload01.plane_type default "",
+		totalSeats: payload01.total_seats default 0
+	}
+}]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="Copy_of_On Error Propagate" doc:id="c7857255-745a-4cd7-ac25-0c1211fd3f17" >
+				<logger level="INFO" doc:name="Logger" doc:id="eda34b54-aa65-4280-9c26-45051bf00c72" message="Error Occured in fetching data" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="postFlight" doc:id="d29e4082-8649-42b3-885c-ea2b8d26e1bd" >
+		<db:insert doc:name="Insert" doc:id="982301bb-3ded-4d99-bd4d-064a6ecaf109" config-ref="Database_Config">
+			<db:sql ><![CDATA[insert into indigo_flights (flight_code, price, flight_date, origin, destination, emptySeats, plane_type, total_seats) values (:code, :price, :date, :origin, :destination, :emptySeats, :planeType,
+:totalSeats);]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	'code': payload.code,
+	'price': payload.price,
+	'date': payload.date,
+	'origin': payload.origin,
+	'destination': payload.destination,
+	'emptySeats': payload.emptySeats,
+	'planeType': payload.planeType,
+	'totalSeats': payload.totalSeats
+}]]]></db:input-parameters>
+		</db:insert>
+		<set-payload value='{"message": "Flight Booked Successfully"}' doc:name="Set Payload" doc:id="abf27072-eafb-45d7-be40-38acd2e756ad" />
 	</flow>
 </mule>

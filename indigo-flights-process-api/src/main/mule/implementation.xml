@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="bf68dfda-4962-41ce-9b84-4996fd2c89ff" >
+		<http:request-connection host="${request.host}" port="${request.port}" />
+	</http:request-config>
+	<flow name="getFlights-ProcessFLow" doc:id="17581ead-4683-44c4-8f95-2f3bba26fda5" >
+		<http:listener doc:name="Listener" doc:id="cf94e96f-35f3-4fb9-8ede-5a865ceb5dd9" config-ref="indigo-flight-booking-api-httpListenerConfig" path="${http.path}"/>
+		<http:request method="GET" doc:name="Request" doc:id="0af7e6bc-48c9-484f-b381-82fd0f20bd01" config-ref="HTTP_Request_configuration" path="${request.path}"/>
+		<ee:transform doc:name="Transform Message" doc:id="a3be3235-c588-498a-96fb-dd1103fbed7d" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

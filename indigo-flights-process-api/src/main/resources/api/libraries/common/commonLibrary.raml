@@ -1,0 +1,7 @@
+#%RAML 1.0 Library
+usage:
+traits:
+  transactionId: !include /libraries/common/traits/header.raml
+  origin: !include /libraries/common/traits/queryParams-origin.raml
+  destination: !include /libraries/common/traits/queryParams-destination.raml
+  commonErrorResponses: !include /libraries/common/traits/errorResponses.raml
