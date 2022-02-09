@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="implementationFlow" doc:id="85ae009b-8e8b-4534-a8a3-41e2cadf0530" >
+		<db:select doc:name="Select" doc:id="e5f3ea0e-7b89-4073-9808-5a9e5039a983" config-ref="Database_Config">
+			<db:sql ><![CDATA[select * from indigo_flights where flight_id = 1]]></db:sql>
+		</db:select>
+		<logger level="INFO" doc:name="Logger" doc:id="a384e034-a382-4988-8929-3d55e47209de" message="#[payload]"/>
+		<ee:transform doc:name="Transform Message" doc:id="014e3879-fa73-4d87-b014-07bb956914d3" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	flightCode: payload.flight_code default "",
+	fromAirportCode: payload.origin default "",
+	toAirportCode: payload.destination default "",
+	departureDate: payload.flight_date as String default "",
+	emptySeats: payload.emptySeats default 0,
+	totalSeats: payload.total_seats default 0,
+	price: payload.price default 0,
+	planeType: payload.plane_type default ""
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="73631828-2ad3-4255-aceb-a9afd99af3d2" message="#[payload]"/>
+	</flow>
+</mule>

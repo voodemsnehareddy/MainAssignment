@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="getHotel" doc:id="6a1d5305-492a-46ae-a881-dd834e2c8ac2" >
+		<logger level="INFO" doc:name="Logger" doc:id="1a270c5c-cb23-48ce-8a7b-ae6741ebb670" message="#[payload]"/>
+		<db:select doc:name="Select" doc:id="9cadb54a-2aea-457d-b4cd-47290abc425f" config-ref="Database_Config">
+			<db:sql ><![CDATA[select * from taj_hotels where booking_id = :ID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	"ID": payload.GetHotel.booking_id
+}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="257c50f9-d4b1-4cfa-b5b0-be6495fd3232" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="df54dd59-4281-4d48-bdb8-3adda243c9ce" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+---
+{
+	hotels: payload
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="8068725e-012c-4df2-850a-47a74ca498de" message="#[payload]"/>
+	</flow>
+	<flow name="bookHotel" doc:id="c759496f-9316-4ea6-888e-b84c3dcdb41e" >
+		<logger level="INFO" doc:name="Logger" doc:id="49c2900e-1a76-4b32-9d11-e22690bd876a" message="#[payload]"/>
+		<db:insert doc:name="Insert" doc:id="23c30616-0500-4823-a796-2869f2793f95" config-ref="Database_Config">
+			<db:sql ><![CDATA[insert into taj_hotels (hotelName, location, hotelDesc, roomNo, price, persons, bookedDate) values (:hotelName, :location, :hotelDesc, :roomNo, :price, :persons, :bookedDate);]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	"hotelName": payload.BookHotel.hotelType.hotelName,
+	"location": payload.BookHotel.hotelType.location,
+	"hotelDesc": payload.BookHotel.hotelType.hotelDesc,
+	"roomNo": payload.BookHotel.hotelType.roomNo,
+	"price": payload.BookHotel.hotelType.price,
+	"persons": payload.BookHotel.hotelType.persons,
+	"bookedDate": payload.BookHotel.hotelType.bookedDate,
+}]]]></db:input-parameters>
+		</db:insert>
+		<ee:transform doc:name="Transform Message" doc:id="afbbb419-a49f-41c8-a355-9c47be4d5846">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+---
+{
+	"message": "Hotel booked successfully!"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="b8a905d1-2d11-4898-8187-8552734bd9e9" />
+	</flow>
+</mule>

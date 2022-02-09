@@ -47,6 +47,13 @@
 			<classifier>mule-plugin</classifier>
 		</dependency>
 		<dependency>
+			<groupId>bdce1dbf-9c8a-46ea-ab6f-6dc502f719f0</groupId>
+			<artifactId>indigo-flight-process-api</artifactId>
+			<version>1.0.1</version>
+			<classifier>raml</classifier>
+			<type>zip</type>
+		</dependency>
+		<dependency>
 			<groupId>org.mule.modules</groupId>
 			<artifactId>mule-apikit-module</artifactId>
 			<version>1.5.5</version>

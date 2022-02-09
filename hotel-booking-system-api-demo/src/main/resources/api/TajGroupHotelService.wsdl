@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:taj="http://www.tajgrouphotels.com/TajGroupHotelService/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="TajGroupHotelService" targetNamespace="http://www.tajgrouphotels.com/TajGroupHotelService/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://www.tajgrouphotels.com/TajGroupHotelService/">
+      <xsd:element name="GetHotel">
+        <xsd:complexType>
+          <xsd:sequence>
+
+          	<xsd:element name="hotelId" type="xsd:integer"></xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="GetHotelResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+          	<xsd:element name="hotel" type="taj:HotelType"></xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    
+      <xsd:element name="AddHotels">
+      	<xsd:complexType>
+      		<xsd:sequence>
+      			<xsd:element name="in" type="xsd:string"></xsd:element>
+      		</xsd:sequence>
+      	</xsd:complexType>
+      </xsd:element>
+      <xsd:element name="AddHotelsResponse">
+      	<xsd:complexType>
+      		<xsd:sequence>
+      			<xsd:element name="out" type="xsd:string"></xsd:element>
+      		</xsd:sequence>
+      	</xsd:complexType>
+      </xsd:element>
+      <xsd:element name="AddHotel">
+      	<xsd:complexType>
+      		<xsd:sequence>
+      			<xsd:element name="hotel" type="taj:HotelType"></xsd:element>
+      		</xsd:sequence>
+      	</xsd:complexType>
+      </xsd:element>
+      <xsd:element name="AddHotelResponse">
+      	<xsd:complexType>
+      		<xsd:sequence>
+      			<xsd:element name="responseMessage"
+      				type="xsd:string">
+      			</xsd:element>
+      			<xsd:element name="reference" type="xsd:integer" maxOccurs="1" minOccurs="0"></xsd:element>
+      		</xsd:sequence>
+      	</xsd:complexType>
+      </xsd:element>
+    
+      <xsd:complexType name="HotelType">
+      	<xsd:sequence>
+      		<xsd:element name="hotelId" type="xsd:integer"
+      			maxOccurs="1" minOccurs="0">
+      		</xsd:element>
+      		<xsd:element name="hotelName" type="xsd:string"></xsd:element>
+      		<xsd:element name="location" type="xsd:string"></xsd:element>
+      		<xsd:element name="bookingDate" type="xsd:string"></xsd:element>
+      		<xsd:element name="cost" type="xsd:int"></xsd:element>
+      		<xsd:element name="status" type="xsd:boolean"></xsd:element>
+      		<xsd:element name="roomsAvailable" type="xsd:integer"></xsd:element>
+      		<xsd:element name="hotelDesc" type="xsd:string"></xsd:element>
+      	</xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="UpdateHotel">
+      	<xsd:complexType>
+      		<xsd:sequence>
+      			<xsd:element name="hotel" type="taj:HotelType"></xsd:element>
+      		</xsd:sequence>
+      	</xsd:complexType>
+      </xsd:element>
+      <xsd:element name="UpdateHotelResponse">
+      	<xsd:complexType>
+      		<xsd:sequence>
+      			<xsd:element name="responseMessage"
+      				type="xsd:string">
+      			</xsd:element>
+      			<xsd:element name="reference" type="xsd:integer" maxOccurs="1" minOccurs="0"></xsd:element>
+      		</xsd:sequence>
+      	</xsd:complexType>
+      </xsd:element>
+    
+      <xsd:element name="DeleteHotel">
+      	<xsd:complexType>
+      		<xsd:sequence>
+
+      		</xsd:sequence>
+      	</xsd:complexType>
+      </xsd:element>
+      <xsd:element name="DeleteHotelResponse">
+      	<xsd:complexType>
+      		<xsd:sequence>
+
+      			<xsd:element name="responseMessage"
+      				type="xsd:string">
+      			</xsd:element>
+      			<xsd:element name="reference" type="xsd:integer" maxOccurs="1" minOccurs="0"></xsd:element>
+      		</xsd:sequence>
+      	</xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="GetHotelRequest">
+    <wsdl:part element="taj:GetHotel" name="parameters"/>
+  </wsdl:message>
+  <wsdl:message name="GetHotelResponse">
+    <wsdl:part element="taj:GetHotelResponse" name="parameters"/>
+  </wsdl:message>
+  <wsdl:message name="AddHotelsRequest">
+  	<wsdl:part name="parameters" element="taj:AddHotels"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="AddHotelsResponse">
+  	<wsdl:part name="parameters" element="taj:AddHotelsResponse"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="AddHotelRequest">
+  	<wsdl:part name="parameters" element="taj:AddHotel"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="AddHotelResponse">
+  	<wsdl:part name="parameters" element="taj:AddHotelResponse"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="UpdateHotelRequest">
+  	<wsdl:part name="parameters" element="taj:UpdateHotel"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="UpdateHotelResponse">
+  	<wsdl:part name="parameters" element="taj:UpdateHotelResponse"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="DeleteHotelRequest">
+  	<wsdl:part name="parameters" element="taj:DeleteHotel"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="DeleteHotelResponse">
+  	<wsdl:part name="parameters" element="taj:DeleteHotelResponse"></wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="TajGroupHotelService">
+    <wsdl:operation name="GetHotel">
+      <wsdl:input message="taj:GetHotelRequest"/>
+      <wsdl:output message="taj:GetHotelResponse"/>
+    </wsdl:operation>    <wsdl:operation name="AddHotel">    	<wsdl:input message="taj:AddHotelRequest"></wsdl:input>    	<wsdl:output message="taj:AddHotelResponse"></wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="TajGroupHotelServiceSOAP" type="taj:TajGroupHotelService">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="GetHotel">
+      <soap:operation soapAction="http://www.tajgrouphotels.com/TajGroupHotelService/GetHotel"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AddHotel">
+      <soap:operation soapAction="http://www.tajgrouphotels.com/TajGroupHotelService/AddHotel"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="TajGroupHotelService">
+    <wsdl:port binding="taj:TajGroupHotelServiceSOAP" name="TajGroupHotelServiceSOAP">
+      <soap:address location="http://www.example.org/"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

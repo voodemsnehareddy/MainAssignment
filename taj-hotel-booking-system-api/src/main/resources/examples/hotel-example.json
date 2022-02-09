@@ -1,0 +1,10 @@
+{
+    "booking_id": 1,
+    "persons": 2,
+    "roomNo": 101,
+    "price": 10000.0,
+    "bookedDate": "2022-02-25 23:59:59",
+    "hotelDesc": "sample hotel data",
+    "location": "Hyderabad",
+    "hotelName": "SWG"
+}

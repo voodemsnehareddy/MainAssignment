@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="940979c2-c411-4a6f-bcb8-2e4cdc2b90ec" >
+	</http:request-config>
+	<flow name="indigo-flights-process-apiFlow" doc:id="222700d2-4a45-44c6-b666-eb915c427323" >
+		<http:listener doc:name="Listener" doc:id="1e55fb43-cb23-48f2-b908-a13c44b682fc" config-ref="indigo-flight-booking-process-api-httpListenerConfig" path="/flights" allowedMethods="GET"/>
+		<logger level="INFO" doc:name="Logger" doc:id="d4590575-4538-4cb5-8ffa-cd508031b60b" message="Started"/>
+		<http:request method="GET" doc:name="Request" doc:id="b8db9c5c-15ba-46fa-8908-ef9b470b1cd9" url="http://indigo-flights-system-api-ws-book-holiday.us-e2.cloudhub.io/api/flights" config-ref="HTTP_Request_configuration">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"client_secret" : "egfsjes",
+	"client_id" : "fhegufs"
+}]]]></http:headers>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="81a048f7-0761-4f0f-891e-aebb4a8387fb" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ((item, index) -> {
+	"ID": item.ID,
+	"code": item.code,
+	"price": item.price,
+	"departureDate": item.departureDate,
+	"origin": item.origin,
+	"destination": item.destination,
+	"emptySeats": item.emptySeats,
+	"planeType": item.planeType,
+	"totalSeats": item.totalSeats
+}) filter ((item, index) -> item.origin == 'MUM' and item.destination == 'HYD')]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="3fb641bf-b5d8-4161-8b23-b90c4ea0d1b4" message="Ended"/>
+	</flow>
+	<flow name="getFlightsByID" doc:id="70aff2dd-82e8-4037-9994-1d70f7b41a82" >
+		<http:listener doc:name="Listener" doc:id="d7e0bbcb-6bd2-4a1f-96ab-d31129a75516" config-ref="indigo-flight-booking-process-api-httpListenerConfig" path="/flights/{ID}"/>
+		<logger level="INFO" doc:name="Logger" doc:id="7230ed76-cedd-427d-8623-e50ad2eafc75" />
+		<http:request method="GET" doc:name="Request" doc:id="e06311ff-43c8-4fef-afaf-8fb0718e17d4" config-ref="HTTP_Request_configuration" url="http://indigo-flights-system-api-ws-book-holiday.us-e2.cloudhub.io/api/flights/{ID}">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"client_secret" : "wgdsefy",
+	"client_id" : "gehfes"
+}]]]></http:headers>
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"ID" : attributes.uriParams.ID
+}]]]></http:uri-params>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="5f68fc85-644a-43cb-8734-a87d54316c16" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="025b9580-0831-4358-bccf-44bba68ae9ea" />
+	</flow>
+	<flow name="indigo-flights-process-apiFlow1" doc:id="88632d8e-4c92-4a31-88d1-f7a96203cb1d" >
+		<http:listener doc:name="Listener" doc:id="d1425700-3a18-4a15-a098-92051bc5668c" config-ref="indigo-flight-booking-process-api-httpListenerConfig" path="/flights" allowedMethods="POST"/>
+		<logger level="INFO" doc:name="Logger" doc:id="44eb9130-fe8d-4757-868e-9814001f5d1b" />
+		<http:request method="POST" doc:name="Request" doc:id="861664a1-ab50-4c2d-823a-2a75c56b91d5" config-ref="HTTP_Request_configuration" url="http://indigo-flights-system-api-ws-book-holiday.us-e2.cloudhub.io/api/flights">
+			<http:body ><![CDATA[#[{
+	"code": payload.code,
+	"price": payload.price,
+	"departureDate": payload.departureDate,
+	"origin": payload.origin,
+	"destination": payload.destination,
+	"emptySeats": payload.emptySeats,
+	"planeType": payload.planeType,
+	"totalSeats": payload.totalSeats
+}]]]></http:body>
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"client_secret" : "dvshd",
+	"client_id" : "HGFJHEF"
+}]]]></http:headers>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="60ce250b-3758-4ce8-aaab-86b457203668" />
+	</flow>
+</mule>

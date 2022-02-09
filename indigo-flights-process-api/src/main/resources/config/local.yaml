@@ -1,16 +1,6 @@
 http:
-  host: "localhost"
-  port: "8083"
+  port: "8082"
   path: "flights"
   
 request:
-  host: "localhost"
-  port: "8081"
-  path: "flights"
-  
-db:
-  host: "book-my-holiday.cinqbi7mgai2.us-east-1.rds.amazonaws.com"
-  port: "3306"
-  username: "admin"
-  password: "Apisero2022"
-  database: "book_my_holiday"
+  path: "http://indigo-flights-system-api-ws-book-holiday.us-e2.cloudhub.io/api/flights"
