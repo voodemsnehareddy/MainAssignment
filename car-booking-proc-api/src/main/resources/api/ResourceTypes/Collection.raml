@@ -1,0 +1,36 @@
+#%RAML 1.0 ResourceType
+is:
+  - !include ../Traits/ClientValidation.raml
+
+securedBy:
+  - !include ../SecuritySchemes/BasicAuthentication.raml
+
+get:
+  description: To get a list of <<resourcePathName>> available in your route.
+  responses:
+    200:
+      body:
+        application/json:
+          type: <<typeName>>
+    400:
+      body:
+        application/json:
+          example:
+            {"reply": "The request information entered is incorrect.. Please correct your request information!"}
+    401:
+      body:
+        application/json:
+          example:
+            {"reply": "You do not have permissions to access this resouce! Check with your administrator for the access."}
+    404:
+      body:
+        application/json:
+          example:
+            {"reply": "The resource you are trying to reach does not exist! Please enter the correct resource data."}
+    500:
+      body:
+        application/json:
+          example:
+            {"reply": "The request you have made is not available at the moment. Please try again after some time. Thank You!"}
+
+

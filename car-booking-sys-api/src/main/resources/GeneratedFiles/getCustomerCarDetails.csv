@@ -1,0 +1,3 @@
+bookingid,name,provider,source,destination,cartype,price,status
+1,Rahul,OLA,Mumbai,Nashik,Mini,2500,CONFIRMED
+2,Rohit,UBER,Mumbai,Pune,Micro,4500,CONFIRMED

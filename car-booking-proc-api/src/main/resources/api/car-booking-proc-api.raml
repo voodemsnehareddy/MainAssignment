@@ -1,0 +1,55 @@
+#%RAML 1.0
+title: car-booking-proc-api
+version: v1
+
+description: Book My Car system API behaves as a connector to car system to retrieve the car information requested by the user.
+
+protocols:
+  - HTTP
+  - HTTPS
+
+mediaType: 
+  - application/json
+
+uses:
+  procBookMyCarLibrary: Libraries/library.raml
+securedBy:
+  - procBookMyCarLibrary.basicAuthentication
+
+/cars:
+  /provider:
+    post:
+      description: Get the confirmation
+      displayName: Confirmation
+      is:
+        - procBookMyCarLibrary.clientValidation
+      body:
+        application/json:
+          type: procBookMyCarLibrary.postProviderCarsInputType
+          examples:
+            input: !include Examples/ProviderExample.raml
+      responses:
+        201:
+          body:
+            application/json:
+              example:
+                {"reply": "Congratulations! your car is booked. Have a safe journey!"}
+  /customer:
+    post:
+      description: Get the confirmation
+      displayName: Confirmation
+      is:
+        - procBookMyCarLibrary.clientValidation
+      body:
+        application/json:
+          type: procBookMyCarLibrary.postCustomerCarsInputType
+          examples:
+            input: !include Examples/CustomerExample.raml
+      responses:
+        201:
+          body:
+            application/json:
+              example:
+                {"reply": "Congratulations! your car is booked. Have a safe journey!"}
+
+

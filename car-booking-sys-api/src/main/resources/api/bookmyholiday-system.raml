@@ -1,0 +1,63 @@
+#%RAML 1.0
+title: Book My Car
+version: v1
+
+description: Book My Car system API behaves as a connector to car system to retrieve the car information requested by the user.
+
+protocols:
+  - HTTP
+  - HTTPS
+
+mediaType: 
+  - application/json
+
+uses:
+  sysBookCarLibrary: Libraries/library.raml
+
+/cars:
+  /provider:
+    get:
+      description: Get the details of cars to the provider
+      displayName: Provider Cars
+      is:
+        - sysBookCarLibrary.clientValidation
+        - sysBookCarLibrary.commonErrorResponses
+      queryParameters:
+        source:
+          type: !include DataTypes/Source.raml
+        destination:
+          type: !include DataTypes/Destination.raml
+        user:
+          type: !include DataTypes/UserType.raml
+      responses:
+        200:
+          body:
+            application/json:
+              type: sysBookCarLibrary.getCarsProviderResponseType[]
+              examples:
+                output: !include Examples/ProviderMultipleExample.raml
+
+  /customer:
+    get:
+      description: Get the details of cars to the customer
+      displayName: Customer Cars
+      is:
+        - sysBookCarLibrary.clientValidation
+        - sysBookCarLibrary.commonErrorResponses  
+      queryParameters:
+        source:
+          type: !include DataTypes/Source.raml
+        destination:
+          type: !include DataTypes/Destination.raml
+        user:
+          type: !include DataTypes/UserType.raml
+        provider:
+          required: false
+          type: !include DataTypes/Provider.raml
+      responses:
+        200:
+          body:
+            application/json:
+              type: sysBookCarLibrary.getCarsCustomerResponseType[]
+              examples:
+                output: !include Examples/CustomerMultipleExample.raml

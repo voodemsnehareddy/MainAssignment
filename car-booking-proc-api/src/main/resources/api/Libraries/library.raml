@@ -1,0 +1,15 @@
+#%RAML 1.0 Library
+
+securitySchemes:
+  basicAuthentication: !include ../SecuritySchemes/BasicAuthentication.raml
+
+traits:
+  clientValidation: !include ../Traits/ClientValidation.raml
+  commonErrorResponses: !include ../Traits/ErrorResponses.raml
+
+resourceTypes:
+  collection: !include ../ResourceTypes/Collection.raml
+
+types:
+  postCustomerCarsInputType: !include ../DataTypes/CarCustomerDataType.raml
+  postProviderCarsInputType: !include ../DataTypes/CarProviderDataType.raml

@@ -1,5 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></mule>
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<flow name="getProviderCarDetailsFlow"
+		doc:id="f2d49313-47bf-41ff-a3c6-f06f5278ab55">
+		<scheduler doc:name="ProviderScheduler"
+			doc:id="3c487f25-e72f-4054-bb54-5fec0dcfbcf3">
+			<scheduling-strategy>
+				<fixed-frequency frequency="15" timeUnit="SECONDS" />
+			</scheduling-strategy>
+		</scheduler>
+		<logger level="INFO" doc:name="Logger" doc:id="e09a7f01-cb97-4671-a863-46280a256eb2" message='#["getProviderCarDetailsFlow Flow Started"]'/>
+		<flow-ref doc:name="setVariables" doc:id="45fa8deb-23c3-43d2-ab9f-f5f53979b68d" name="setValues" />
+		<file:read doc:name="Read"
+			doc:id="496a99ca-fea0-464b-a41f-a91c1d524709"
+			config-ref="File_Config" path="GeneratedFiles/getProviderCarDetails.csv" />
+		<ee:transform doc:name="Transform Message"
+			doc:id="c058f7b7-7026-4809-879a-d9fcdf215eb4">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+var a = vars.provider
+---
+if(a=="")
+	payload
+else
+	payload filter ((item, index) -> item.name==a)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="5d3db943-91da-4f48-8985-5e1d0caa5380" message='#["getProviderCarDetailsFlow Flow Finished"]'/>
+	
+	</flow>
+	<flow name="getCustomerCarDetailsFlow"
+		doc:id="db950060-d890-48a5-8f64-475bbe3512f1">
+		<scheduler doc:name="CustomerScheduler"
+			doc:id="55bdcad5-d968-4f5f-9059-b684a472b128">
+			<scheduling-strategy>
+				<fixed-frequency frequency="15" timeUnit="SECONDS" />
+			</scheduling-strategy>
+		</scheduler>
+		<logger level="INFO" doc:name="Logger" doc:id="5a6d3d4d-3a3d-43a7-a75d-3c8cfb984440" message='#["getCustomerCarDetailsFlow Flow Started"]'/>
+		<flow-ref doc:name="Set Variables" doc:id="5f6a1c2f-be43-4e3d-aac5-f3a3ebd21865" name="setValues" />
+		<file:read doc:name="Read"
+			doc:id="65b3cc91-7fb4-4458-9c10-d6731dd26a50"
+			config-ref="File_Config" path="GeneratedFiles/getCustomerCarDetails.csv" />
+		<ee:transform doc:name="Transform Message"
+			doc:id="f438afba-452e-4d42-9544-d05662ce9b50">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+var a = vars.provider
+---
+if(a=="")
+	payload
+else
+	payload filter ((item, index) -> item.provider==a)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="68f3415b-d014-46b7-9ec4-67cdb58e0237" message='#["getCustomerCarDetailsFlow Flow Finished"]'/>
+	
+	</flow>
+	<sub-flow name="setValues" doc:id="f602f370-d14c-4165-9348-319b8db30de4">
+		<set-variable value="#[attributes.queryParams.source]" doc:name="Set Variable" doc:id="fe2acb2a-1cd5-4343-bfd7-7738d55bc67c" variableName="source" />
+		<set-variable value="#[attributes.queryParams.destination]" doc:name="Set Variable" doc:id="cada0119-a433-49cc-b4d3-723e5390c9b3" variableName="destination" />
+		<set-variable value='#[attributes.queryParams.provider default ""]' doc:name="Set Variable" doc:id="11c04f59-92f1-4b32-be22-6b6a4b6574ea" variableName="provider" />
+	</sub-flow>
+	
+</mule>

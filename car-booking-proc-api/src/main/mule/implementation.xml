@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="postCustomerCar" doc:id="fd1f7181-f34e-4f11-8f5e-eb29c7292c24" >
+		<logger level="INFO" doc:name="Logger" doc:id="f11ed1b2-fcdd-4230-ab1b-ff75e17d62c0" message='#["postCustomerCar Flow Started"]'/>
+		<set-variable value="#[payload.provider]" doc:name="Set Variable" doc:id="3b877cf4-a6d9-434d-b7bb-2e253df0768b" variableName="provider"/>
+		<choice doc:name="Choice" doc:id="b9b728b9-2753-434c-a222-e142b402ef68" >
+			<when expression='#[vars.provider=="OLA"]'>
+				<file:write doc:name="Write" doc:id="e0b7496e-8f55-4254-8e87-fcd903c0268e" config-ref="File_Config" path="C:\Users\sajjanjverma\Documents\GitHub\MainAssignment\car-booking-proc-api\src\main\resources\carData\OlaCustomerRequest.csv" mode="APPEND">
+					<file:content ><![CDATA[#[%dw 2.0
+output application/csv header=false
+---
+payload]]]></file:content>
+				</file:write>
+			</when>
+			<when expression='#[vars.provider=="UBER"]'>
+				<file:write doc:name="Write" doc:id="77b1ecd3-c001-4cf2-ac0f-e4f5784da2b6" config-ref="File_Config" path="C:\Users\sajjanjverma\Documents\GitHub\MainAssignment\car-booking-proc-api\src\main\resources\carData\UberCustomerRequest.csv" mode="APPEND">
+					<file:content ><![CDATA[#[%dw 2.0
+output application/csv header=false
+---
+payload]]]></file:content>
+				</file:write>
+			</when>
+		</choice>
+		<ee:transform doc:name="Transform Message" doc:id="3f4bce81-7d46-472e-8329-5e0300d50428" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  reply: "Congratulations! your car is booked. Have a safe journey!"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="6e575f10-6272-4447-8b99-f2097c386cea" message='#["postCustomerCar Flow Finished"]'/>
+	</flow>
+	<flow name="postProviderCar" doc:id="bb3f569b-3601-48e9-84ec-162c8a1e27a1" >
+		<logger level="INFO" doc:name="Logger" doc:id="558660fa-19e7-4b6a-bd2d-5df587d18be0" message='#["postProviderCar Flow Started"]'/>
+		<set-variable value="#[payload.name]" doc:name="Set Variable" doc:id="2c9e3d60-985b-494b-ab4a-416a2db33277" variableName="provider"/>
+		<choice doc:name="Choice" doc:id="d3cec71c-2c84-45a0-a521-8686279a400b" >
+			<when expression='#[vars.provider=="OLA"]'>
+				<file:write doc:name="Write" doc:id="fa2c0b2b-cad7-416d-902b-77794b8f9c14" config-ref="File_Config" mode="APPEND" path="C:\Users\sajjanjverma\Documents\GitHub\MainAssignment\car-booking-proc-api\src\main\resources\carData\OlaMaster.csv">
+					<file:content ><![CDATA[#[%dw 2.0
+output application/csv header=false
+---
+payload]]]></file:content>
+				</file:write>
+			</when>
+			<when expression='#[vars.provider=="UBER"]'>
+				<file:write doc:name="Write" doc:id="800d4add-ceac-4123-b328-c15cc7fb6683" config-ref="File_Config" mode="APPEND" path="C:\Users\sajjanjverma\Documents\GitHub\MainAssignment\car-booking-proc-api\src\main\resources\carData\UberMaster.csv">
+					<file:content ><![CDATA[#[%dw 2.0
+output application/csv header=false
+---
+payload]]]></file:content>
+				</file:write>
+			</when>
+		</choice>
+		<ee:transform doc:name="Transform Message" doc:id="75e7f4f7-70cc-494b-9aa3-15e14890e02b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  reply: "Congratulations! your car is registered for bookings!"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="91a074d2-9c1d-429a-82dd-24aed24d29e3" message='#["postProviderCar Flow Finished"]'/>
+	</flow>
+</mule>
