@@ -1,0 +1,20 @@
+<ns0:getHotelsResponse xmlns:ns0="http://www.tajhotels.com/hotels/">
+	<return>
+		<hotelID>1</hotelID>
+		<hotelName>Swagath</hotelName>
+		<location>Hyderabad</location>
+		<noOfRooms>20</noOfRooms>
+		<roomType>Queen</roomType>
+		<price>10000</price>
+		<noOfPeople>4</noOfPeople>
+    </return>
+	<return>
+		<hotelID>4</hotelID>
+		<hotelName>Crowne Plaza</hotelName>
+		<location>Bangalore</location>
+		<noOfRooms>25</noOfRooms>
+		<roomType>Triple</roomType>
+		<price>20000</price>
+		<noOfPeople>30</noOfPeople>
+    </return>
+</ns0:getHotelsResponse>

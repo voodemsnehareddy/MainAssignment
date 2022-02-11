@@ -2,52 +2,66 @@
 <mule xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit-soap="http://www.mulesoft.org/schema/mule/apikit-soap" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/apikit-soap http://www.mulesoft.org/schema/mule/apikit-soap/current/mule-apikit-soap.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
     <apikit-soap:config httpStatusVarName="httpStatus" name="soapkit-config" port="hotelsSOAP" service="hotels" wsdlLocation="hotels.wsdl"/>
     <flow name="api-main">
-        <http:listener config-ref="api-httpListenerConfig" path="/hotels/hotelsSOAP">
+        <http:listener path="/hotels/hotelsSOAP" config-ref="api-httpListenerConfig">
             <http:response statusCode="#[attributes.additionalTransportData.statusCode default 200]">
-                <http:body>#[payload]</http:body>
-                <http:headers>#[attributes.protocolHeaders default {}]</http:headers>
+                <http:headers><![CDATA[#[attributes.protocolHeaders default {}]]]></http:headers>
             </http:response>
             <http:error-response statusCode="#[attributes.additionalTransportData.statusCode default 500]">
-                <http:body>#[payload]</http:body>
-                <http:headers>#[attributes.protocolHeaders default {}]</http:headers>
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[attributes.protocolHeaders default {}]]]></http:headers>
             </http:error-response>
         </http:listener>
         <apikit-soap:router config-ref="soapkit-config">
-            <apikit-soap:attributes><![CDATA[#[%dw 2.0
+            <apikit-soap:message>#[payload]</apikit-soap:message>
+            <apikit-soap:attributes>#[
+              %dw 2.0
               output application/java
               ---
               {
                   headers: attributes.headers,
                   method: attributes.method,
                   queryString: attributes.queryString
-            }]]]></apikit-soap:attributes>
+            }]</apikit-soap:attributes>
         </apikit-soap:router>
     </flow>
-    <flow name="BookHotel:\soapkit-config">
-        <ee:transform doc:name="XML to JSON">
+    <flow name="getHotels:\soapkit-config">
+        <ee:transform>
             <ee:message>
                 <ee:set-payload><![CDATA[%dw 2.0
-output application/json
-
+output application/java
+ns soap http://schemas.xmlsoap.org/soap/envelope
+ns ns0 http://www.tajhotels.com/hotels/
 ---
-payload.body]]>
+{
+	location: payload.body.ns0#getHotels.location
+}]]>
                 </ee:set-payload>
             </ee:message>
         </ee:transform>
-		<flow-ref doc:name="bookHotel" doc:id="35eaa830-77d0-46aa-beda-7a20b333ca44" name="bookHotel"/>
+		<flow-ref doc:name="getHotelsByLocation" doc:id="848eb2ac-0e6b-4123-b461-b4a0a57a34eb" name="getHotelsByLocation"/>
     </flow>
-    <flow name="GetHotel:\soapkit-config">
-		<ee:transform doc:id="541c225a-03da-42c8-9780-2a3eb661aa47" doc:name="XML to JSON">
+    <flow name="bookHotel:\soapkit-config">
+        <ee:transform>
             <ee:message>
                 <ee:set-payload><![CDATA[%dw 2.0
 output application/json
+ns soap http://schemas.xmlsoap.org/soap/envelope
+ns ns0 http://www.tajhotels.com/hotels/
 ---
-
-payload.body
-]]>
+{
+    hotelName: payload.body.ns0#bookHotel.hotelName default "",
+    location: payload.body.ns0#bookHotel.location default "",
+    noOfRooms: payload.body.ns0#bookHotel.noOfRooms default 0,
+    roomType: payload.body.ns0#bookHotel.roomType default "",
+    price: payload.body.ns0#bookHotel.price default 0,
+    noOfPeople: payload.body.ns0#bookHotel.noOfPeople default 0,
+    checkIn: payload.body.ns0#bookHotel.checkIn default "",
+    checkOut: payload.body.ns0#bookHotel.checkOut default "",
+    hotelID: payload.body.ns0#bookHotel.hotelID default 0,
+}]]>
                 </ee:set-payload>
             </ee:message>
         </ee:transform>
-		<flow-ref doc:name="getHotelByBookingId" doc:id="3fba0e61-f6b3-43fd-acf3-8c920704ed01" name="getHotelByBookingId"/>
+		<flow-ref doc:name="bookHotel" doc:id="6d850dc9-6947-4e6d-a767-b627e6ac73fc" name="bookHotel"/>
     </flow>
 </mule>

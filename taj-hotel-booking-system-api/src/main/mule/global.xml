@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns="http://www.mulesoft.org/schema/mule/core"
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns="http://www.mulesoft.org/schema/mule/core"
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<http:listener-config name="api-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="8083"/>
+    </http:listener-config>
 	<db:config name="Database_Config" doc:name="Database Config" doc:id="bcafdb9b-5be3-43be-9833-0663edcb6f82" >
-		<db:my-sql-connection host="book-my-holiday.cinqbi7mgai2.us-east-1.rds.amazonaws.com" port="3306" user="admin" password="Apisero2022" database="book_my_holiday" />
+		<db:my-sql-connection host="${db.host}" port="${db.port}" user="${db.username}" password="${db.password}" database="${db.database}" />
 	</db:config>
+	<configuration-properties doc:name="Configuration properties" doc:id="77b4c110-08e9-4f65-9e24-614c5c44b0c8" file="config\dev-config.yaml" />
 </mule>

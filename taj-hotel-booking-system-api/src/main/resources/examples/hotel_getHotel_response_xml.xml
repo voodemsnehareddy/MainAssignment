@@ -1,0 +1,12 @@
+<ns0:GetHotelResponse xmlns:ns0="http://www.tajhotels.com/hotels/">
+	<return>
+        <booking_id>1</booking_id>
+		<persons>2</persons>
+		<roomNo>101</roomNo>
+		<price>10000</price>
+		<bookedDate>2022-02-25 23:59:59</bookedDate>
+		<hotelDesc>sample hotel data</hotelDesc>
+		<location>Hyderabad</location>
+		<hotelName>SWG</hotelName>
+    </return>
+</ns0:GetHotelResponse>

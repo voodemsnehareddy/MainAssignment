@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<wsc:config name="Web_Service_Consumer_Config" doc:name="Web Service Consumer Config" doc:id="77b06b30-4945-456d-b0fe-5408eea6da06" >
+		<wsc:connection wsdlLocation="api\hotels.wsdl" service="hotels" port="hotelsSOAP" address="http://www.example.org/" />
+	</wsc:config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="5e70cbf0-01a5-4b90-bb62-398f79f58b4e" >
+		<http:request-connection host="localhost" port="8081" />
+	</http:request-config>
+	<flow name="getHotel" doc:id="fa4322e7-039b-4c8b-b6fb-bf04c90d1ea6" >
+		<logger level="INFO" doc:name="Logger" doc:id="6b3eab74-8890-4e01-8ce0-568b533261df" message="#[attributes.uriParams.bookingId]"/>
+		<set-variable value="#[attributes.uriParams.bookingId]" doc:name="Set Variable" doc:id="ba20a22d-b91f-41e0-bd70-5814e357134e" variableName="bookingId"/>
+		<http:request method="POST" doc:name="Request" doc:id="6b6b53b8-2cbc-4547-b8a0-39d3bf80ffe1" path="/hotels/hotelsSOAP" config-ref="HTTP_Request_configuration">
+			<http:body ><![CDATA[#['<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:hot="http://www.tajhotels.com/hotels/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <hot:GetHotel>
+         <booking_id>' ++ vars.bookingId ++ '</booking_id>
+      </hot:GetHotel>
+   </soapenv:Body>
+</soapenv:Envelope>']]]></http:body>
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"client_secret" : "gdsjgfs",
+	"client_id" : "dbsjeghfsehd"
+}]]]></http:headers>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="f42d04e1-e488-41fa-9c7e-d9a1eb2e0744" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="fedbacdf-f3b7-4a3b-b177-49d115bc2304" message="#[payload]" />
+	</flow>
+	<flow name="bookHotel" doc:id="5c3b21c1-826c-47bf-8b76-9780ec9affd4" >
+		<logger level="INFO" doc:name="Logger" doc:id="b7a3e600-69f5-4568-85ab-c87f195749a8" message="#[payload]"/>
+		<set-variable value="#['&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:hot=&quot;http://www.tajhotels.com/hotels/&quot;&gt;']" doc:name="Set Variable" doc:id="c3744666-fa52-47fb-837e-eb575b395af2" variableName="text"/>
+		<http:request method="POST" doc:name="Request" doc:id="9a2131fe-381a-4524-b42d-020b72e52744" config-ref="HTTP_Request_configuration" path="/hotels/hotelsSOAP">
+			<http:body ><![CDATA[#['<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:hot="http://www.tajhotels.com/hotels/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <hot:BookHotel>
+         <hotelType>
+            <hotelName>' ++ payload.hotelName ++ '</hotelName>
+            <location>' ++ payload.location ++ '</location>
+            <hotelDesc>' ++ payload.hotelDesc ++ '</hotelDesc>
+            <bookedDate>' ++ payload.bookedDate ++ '</bookedDate>
+            <room>
+               <roomNo>' ++ payload.room.roomNo ++ '</roomNo>
+               <price>' ++ payload.room.price ++ '</price>
+               <persons>' ++ payload.room.persons ++ '</persons>
+            </room>
+         </hotelType>
+      </hot:BookHotel>
+   </soapenv:Body>
+</soapenv:Envelope>']]]></http:body>
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"client_secret" : "Value",
+	"client_id" : "Value"
+}]]]></http:headers>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="52a9e030-5393-4429-bd42-aebe00180cb8">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="f47858fd-5477-4c54-b9f2-01dac8bfef66" />
+	</flow>
+	<flow name="implementationFlow" doc:id="51156de3-1966-4149-8a14-fc7652d4b6d6" >
+		<set-payload value="#['&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:hot=&quot;http://www.tajhotels.com/hotels/&quot;&gt;&#10;   &lt;soapenv:Header/&gt;&#10;   &lt;soapenv:Body&gt;&#10;      &lt;hot:BookHotel&gt;&#10;         &lt;hotelType&gt;&#10;            &lt;hotelName&gt;' ++ payload.hotelName ++ '&lt;/hotelName&gt;&#10;            &lt;location&gt;' ++ payload.location ++ '&lt;/location&gt;&#10;            &lt;hotelDesc&gt;' ++ payload.hotelDesc ++ '&lt;/hotelDesc&gt;&#10;            &lt;bookedDate&gt;' ++ payload.bookedDate ++ '&lt;/bookedDate&gt;&#10;            &lt;room&gt;&#10;               &lt;roomNo&gt;' ++ payload.roomNo ++ '&lt;/roomNo&gt;&#10;               &lt;price&gt;' ++ payload.price ++ '&lt;/price&gt;&#10;               &lt;persons&gt;' ++ payload.persons ++ '&lt;/persons&gt;&#10;            &lt;/room&gt;&#10;         &lt;/hotelType&gt;&#10;      &lt;/hot:BookHotel&gt;&#10;   &lt;/soapenv:Body&gt;&#10;&lt;/soapenv:Envelope&gt;']" doc:name="Set Payload" doc:id="dd737823-a450-41ec-855a-d6a1a31b83f8" />
+	</flow>
+	<flow name="implementationFlow1" doc:id="4826364e-6c41-4ca1-bb64-dc4c1268a348" >
+		<wsc:consume doc:name="Consume" doc:id="c529f910-221b-4945-a744-0e36b5aab0f5" config-ref="Web_Service_Consumer_Config" operation="GetHotel"/>
+	</flow>
+</mule>

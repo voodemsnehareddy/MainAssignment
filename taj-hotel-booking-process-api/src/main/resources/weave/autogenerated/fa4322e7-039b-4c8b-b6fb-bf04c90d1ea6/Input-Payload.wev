@@ -1,0 +1,15 @@
+%dw 2.0
+
+type auto_fa4322e7_039b_4c8b_b6fb_bf04c90d1ea6_Input_Payload = {|
+  booking_id: Number, 
+  hotelName: String, 
+  location: String, 
+  hotelDesc: String, 
+  bookedDate: String, 
+  room: {|
+    roomNo: Number, 
+    price: Number, 
+    persons: Number
+  |}
+|}
+
