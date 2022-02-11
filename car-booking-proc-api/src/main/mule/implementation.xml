@@ -1,16 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:file="http://www.mulesoft.org/schema/mule/file"
-	xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
-http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 	<flow name="postCustomerCar" doc:id="fd1f7181-f34e-4f11-8f5e-eb29c7292c24" >
-		<logger level="INFO" doc:name="Logger" doc:id="f11ed1b2-fcdd-4230-ab1b-ff75e17d62c0" message='#["postCustomerCar Flow Started"]'/>
-		<set-variable value="#[payload.provider]" doc:name="Set Variable" doc:id="3b877cf4-a6d9-434d-b7bb-2e253df0768b" variableName="provider"/>
-		<choice doc:name="Choice" doc:id="b9b728b9-2753-434c-a222-e142b402ef68" >
+		<logger level="INFO" doc:name="Init Logger" doc:id="f11ed1b2-fcdd-4230-ab1b-ff75e17d62c0" message='#["postCustomerCar Flow Started"]'/>
+		<set-variable value='#[attributes.queryParams.provider default ""]' doc:name="providerVariable" doc:id="39133cde-6b79-4428-bcff-d0313ab27b43" variableName="provider"/>
+		<flow-ref doc:name="setValues" doc:id="66cd2842-c51c-4c59-8bb5-06c45de9a303" name="setValues" />
+		<http:request method="GET" doc:name="CarBookingSystemRequest" doc:id="1ddb420b-d111-4fe8-b0d2-affb40175361" config-ref="HTTP_Request_configuration" path="/api/cars/customer">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"client_secret" : "${request.client_secret}",
+	"client_id" : "${request.client_id}"
+}]]]></http:headers>
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"source" : vars.source,
+	"user" : "customer",
+	"destination" : vars.destination
+}]]]></http:query-params>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="b923a7d2-e6e9-47d2-b909-8930aaaf13e2" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+type currency=String{format: '.00'}
+var a = vars.provider
+fun filterResult()=
+if(a=="")
+(payload map (item,index) ->{
+	"bookingId":(index),
+	"name": item.name,
+	"provider": item.provider,
+	"source":item.source,
+	"destination ":item.destination,
+	"carType":item.cartype,
+	"price":item.price as Number as currency,
+	"status":item.status
+})
+else
+(payload map (item,index) ->{
+	"bookingId":(index),
+	"name": item.name,
+	"provider": item.provider,
+	"source":item.source,
+	"destination ":item.destination,
+	"carType":item.cartype,
+	"price":item.price as Number as currency,
+	"status":item.status
+})filter ( $.provider == a)
+---
+filterResult()]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Request Response" doc:id="bf1950a3-ab96-4b6d-8f52-b1e81db64845" message='#[payload]'/>
+		<choice doc:name="Check Provider" doc:id="b9b728b9-2753-434c-a222-e142b402ef68" >
 			<when expression='#[vars.provider=="OLA"]'>
-				<file:write doc:name="Write" doc:id="e0b7496e-8f55-4254-8e87-fcd903c0268e" config-ref="File_Config" path="C:\Users\sajjanjverma\Documents\GitHub\MainAssignment\car-booking-proc-api\src\main\resources\carData\OlaCustomerRequest.csv" mode="APPEND">
+				<file:write doc:name="Write to Ola Customer File" doc:id="e0b7496e-8f55-4254-8e87-fcd903c0268e" config-ref="File_Config" path="C:\Users\sajjanjverma\Documents\GitHub\MainAssignment\car-booking-proc-api\src\main\resources\carData\OlaCustomerRequest.csv" mode="APPEND">
 					<file:content ><![CDATA[#[%dw 2.0
 output application/csv header=false
 ---
@@ -18,15 +69,23 @@ payload]]]></file:content>
 				</file:write>
 			</when>
 			<when expression='#[vars.provider=="UBER"]'>
-				<file:write doc:name="Write" doc:id="77b1ecd3-c001-4cf2-ac0f-e4f5784da2b6" config-ref="File_Config" path="C:\Users\sajjanjverma\Documents\GitHub\MainAssignment\car-booking-proc-api\src\main\resources\carData\UberCustomerRequest.csv" mode="APPEND">
+				<file:write doc:name="Write to Uber Customer File" doc:id="77b1ecd3-c001-4cf2-ac0f-e4f5784da2b6" config-ref="File_Config" path="C:\Users\sajjanjverma\Documents\GitHub\MainAssignment\car-booking-proc-api\src\main\resources\carData\UberCustomerRequest.csv" mode="APPEND">
 					<file:content ><![CDATA[#[%dw 2.0
 output application/csv header=false
 ---
 payload]]]></file:content>
 				</file:write>
 			</when>
+			<otherwise >
+				<file:write doc:name="Write to Customer File" doc:id="fd2a4bde-b0aa-45b2-ad05-3f3a9045894c" config-ref="File_Config" mode="APPEND" path="C:\Users\sajjanjverma\Documents\GitHub\MainAssignment\car-booking-proc-api\src\main\resources\carData\CustomerRequest.csv">
+					<file:content ><![CDATA[#[%dw 2.0
+output application/csv header=false
+---
+payload]]]></file:content>
+				</file:write>
+			</otherwise>
 		</choice>
-		<ee:transform doc:name="Transform Message" doc:id="3f4bce81-7d46-472e-8329-5e0300d50428" >
+		<ee:transform doc:name="Success Message" doc:id="3f4bce81-7d46-472e-8329-5e0300d50428" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
@@ -36,14 +95,64 @@ output application/json
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<logger level="INFO" doc:name="Logger" doc:id="6e575f10-6272-4447-8b99-f2097c386cea" message='#["postCustomerCar Flow Finished"]'/>
+		<logger level="INFO" doc:name="End Logger" doc:id="6e575f10-6272-4447-8b99-f2097c386cea" message='#["postCustomerCar Flow Finished"]'/>
 	</flow>
 	<flow name="postProviderCar" doc:id="bb3f569b-3601-48e9-84ec-162c8a1e27a1" >
-		<logger level="INFO" doc:name="Logger" doc:id="558660fa-19e7-4b6a-bd2d-5df587d18be0" message='#["postProviderCar Flow Started"]'/>
-		<set-variable value="#[payload.name]" doc:name="Set Variable" doc:id="2c9e3d60-985b-494b-ab4a-416a2db33277" variableName="provider"/>
+		<logger level="INFO" doc:name="Init Logger" doc:id="558660fa-19e7-4b6a-bd2d-5df587d18be0" message='#["postProviderCar Flow Started"]'/>
+		<set-variable value='#[attributes.queryParams.provider default ""]' doc:name="providerVariable" doc:id="0acc8994-640e-46ad-9d6f-abdf786f58e1" variableName="provider" />
+		<flow-ref doc:name="setValues" doc:id="b3c141fa-3a24-422f-9788-7dcc17ccb7dc" name="setValues" />
+		<http:request method="GET" doc:name="CarBookingSystem Request" doc:id="ceb7be11-f329-41cf-af6b-fe453cf5316a" config-ref="HTTP_Request_configuration" path="/api/cars/provider">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"client_secret" : "${request.client_secret}",
+	"client_id" : "${request.client_id}"
+}]]]></http:headers>
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"source" : vars.source,
+	"user" : "provider",
+	"destination" : vars.destination
+}]]]></http:query-params>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="e8a0013b-ee08-4464-9b07-067fd8f0f476" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+type currency=String{format: '.00'}
+var a = vars.provider
+fun filterResult()=
+if(a=="")
+(payload map (item,index) ->{
+	"id":(index),
+	"name": item.name,
+	"description": item.description,
+	"source":item.source,
+	"destination ":item.destination,
+	"carType":item.cartype,
+	"price":item.price as Number as currency,
+	"status":item.status
+})
+else
+(payload map (item,index) ->{
+	"id":(index),
+	"name": item.name,
+	"description": item.description,
+	"source":item.source,
+	"destination ":item.destination,
+	"carType":item.cartype,
+	"price":item.price as Number as currency,
+	"status":item.status
+})filter ( $.name == a)
+---
+filterResult()]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Request Logger" doc:id="1faa68f5-b723-4010-871a-17f49fc1ddb8" message='#[payload]'/>
 		<choice doc:name="Choice" doc:id="d3cec71c-2c84-45a0-a521-8686279a400b" >
 			<when expression='#[vars.provider=="OLA"]'>
-				<file:write doc:name="Write" doc:id="fa2c0b2b-cad7-416d-902b-77794b8f9c14" config-ref="File_Config" mode="APPEND" path="C:\Users\sajjanjverma\Documents\GitHub\MainAssignment\car-booking-proc-api\src\main\resources\carData\OlaMaster.csv">
+				<file:write doc:name="Write to Ola Master" doc:id="fa2c0b2b-cad7-416d-902b-77794b8f9c14" config-ref="File_Config" mode="APPEND" path="C:\Users\sajjanjverma\Documents\GitHub\MainAssignment\car-booking-proc-api\src\main\resources\carData\OlaMaster.csv">
 					<file:content ><![CDATA[#[%dw 2.0
 output application/csv header=false
 ---
@@ -51,15 +160,24 @@ payload]]]></file:content>
 				</file:write>
 			</when>
 			<when expression='#[vars.provider=="UBER"]'>
-				<file:write doc:name="Write" doc:id="800d4add-ceac-4123-b328-c15cc7fb6683" config-ref="File_Config" mode="APPEND" path="C:\Users\sajjanjverma\Documents\GitHub\MainAssignment\car-booking-proc-api\src\main\resources\carData\UberMaster.csv">
+				<file:write doc:name="Write to Uber Master" doc:id="800d4add-ceac-4123-b328-c15cc7fb6683" config-ref="File_Config" mode="APPEND" path="C:\Users\sajjanjverma\Documents\GitHub\MainAssignment\car-booking-proc-api\src\main\resources\carData\UberMaster.csv">
 					<file:content ><![CDATA[#[%dw 2.0
 output application/csv header=false
 ---
 payload]]]></file:content>
 				</file:write>
 			</when>
-		</choice>
-		<ee:transform doc:name="Transform Message" doc:id="75e7f4f7-70cc-494b-9aa3-15e14890e02b" >
+			<otherwise>
+				<file:write doc:name="Write" doc:id="85a1c4b9-a8ce-46bf-9a95-c53f01dbca35" config-ref="File_Config" mode="APPEND" path="C:\Users\sajjanjverma\Documents\GitHub\MainAssignment\car-booking-proc-api\src\main\resources\carData\ProviderMaster.csv">
+					<file:content ><![CDATA[#[%dw 2.0
+output application/csv header=false
+---
+payload]]]></file:content>
+				</file:write>
+			</otherwise>
+		
+</choice>
+		<ee:transform doc:name="Success Message" doc:id="75e7f4f7-70cc-494b-9aa3-15e14890e02b" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
@@ -69,6 +187,12 @@ output application/json
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<logger level="INFO" doc:name="Logger" doc:id="91a074d2-9c1d-429a-82dd-24aed24d29e3" message='#["postProviderCar Flow Finished"]'/>
+		<logger level="INFO" doc:name="End Logger" doc:id="91a074d2-9c1d-429a-82dd-24aed24d29e3" message='#["postProviderCar Flow Finished"]'/>
 	</flow>
+	<sub-flow name="setValues" doc:id="47449e8d-ac4b-49ea-94a9-81ab87543397" >
+		<set-variable value='#[payload.source default ""]' doc:name="sourceVariable" doc:id="261a5042-54e5-4a64-b2db-d57d4d3ebb11" variableName="source"/>
+		<set-variable value='#[payload.destination default ""]' doc:name="destinationVariable" doc:id="d54115dd-0668-44bd-90a2-651036c849e6" variableName="destination"/>
+		<set-variable value="#[payload]" doc:name="payloadVariable" doc:id="b36e846e-1e34-424d-bd1c-42e4edac1f25" variableName="payloadVar"/>
+	
+</sub-flow>
 </mule>

@@ -1,3 +1,1 @@
 bookingid,name,provider,source,destination,cartype,price,status
-1,RAHUL,UBER,Mumbai,Pune,Micro,5000,CONFIRMED
-2,ROHIT,UBER,Mumbai,Pune,Micro,5000,CONFIRMED
