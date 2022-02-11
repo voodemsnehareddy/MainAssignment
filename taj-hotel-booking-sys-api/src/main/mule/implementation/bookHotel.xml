@@ -26,10 +26,10 @@ values (:hotelName, :location, :noOfRooms, :roomType, :price, :noOfPeople, :chec
 		<ee:transform doc:name="Booking Successful Message" doc:id="98350aba-fbd0-41c8-b3da-414705c93365" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
-output application/json
+output application/xml
 ---
 {
-	"message": "Your Room is Booked. Enjoy your stay"
+	"message": "Hotel booked successfully!"
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
