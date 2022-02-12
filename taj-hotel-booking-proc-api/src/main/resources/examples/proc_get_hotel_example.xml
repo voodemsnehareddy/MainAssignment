@@ -1,0 +1,8 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:hot="http://www.tajhotels.com/hotels/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <hot:getHotels>
+         <location>Hyderabad</location>
+      </hot:getHotels>
+   </soapenv:Body>
+</soapenv:Envelope>

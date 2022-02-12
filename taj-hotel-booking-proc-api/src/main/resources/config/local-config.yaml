@@ -1,0 +1,4 @@
+webservice:
+  wsdllocation: "http://taj-hotel-booking-sys-api.us-e2.cloudhub.io/hotels/hotelsSOAP?wsdl"
+  port: "hotelsSOAP"
+  service: "hotels"

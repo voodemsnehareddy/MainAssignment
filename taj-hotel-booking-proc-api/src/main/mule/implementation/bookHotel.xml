@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
+	<flow name="bookHotelFlow" doc:id="0d1c9bcc-a2ab-4740-9866-a7a02da6f483" >
+		<logger level="INFO" doc:name="Logger" doc:id="e99d3742-d31b-4e53-b283-42b703654e41" />
+		<wsc:consume doc:name="Consume" doc:id="3e4a2e69-f42e-4247-b625-82dda71f5ba9" config-ref="Web_Service_Consumer_Config" operation="bookHotel">
+			<wsc:message >
+				<wsc:body ><![CDATA[#[%dw 2.0
+output application/json
+ns soap http://schemas.xmlsoap.org/soap/envelope
+ns ns0 http://www.tajhotels.com/hotels/
+---
+{
+    hotelName: payload.body.ns0#bookHotel.hotelName default "",
+    location: payload.body.ns0#bookHotel.location default "",
+    noOfRooms: payload.body.ns0#bookHotel.noOfRooms default 0,
+    roomType: payload.body.ns0#bookHotel.roomType default "",
+    price: payload.body.ns0#bookHotel.price default 0,
+    noOfPeople: payload.body.ns0#bookHotel.noOfPeople default 0,
+    checkIn: payload.body.ns0#bookHotel.checkIn default "",
+    checkOut: payload.body.ns0#bookHotel.checkOut default "",
+    hotelID: payload.body.ns0#bookHotel.hotelID default 0,
+}]]]></wsc:body>
+			</wsc:message>
+		</wsc:consume>
+		<logger level="INFO" doc:name="Logger" doc:id="cf7afe57-aabd-4177-b752-9093c326c126" />
+	</flow>
+	<flow name="bookHotelFlow1" doc:id="a572a1fd-1a42-42ad-a26a-177f1510ffbe" >
+		<http:listener doc:name="Listener" doc:id="0dbd1f7f-0732-44e0-875d-d1cd54b71da0" config-ref="taj-group-hotel-booking-api-httpListenerConfig" path="/test"/>
+		<wsc:consume operation="getHotels" doc:name="getHotels" doc:id="0eda6755-5b09-4d00-aa3b-f60e51d43851" config-ref="Web_Service_Consumer_Config">
+			<wsc:message >
+				<wsc:body ><![CDATA[#['<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:hot="http://www.tajhotels.com/hotels/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <hot:getHotels>
+        <location>Mumbai</location>
+      </hot:getHotels>
+   </soapenv:Body>
+</soapenv:Envelope>']]]></wsc:body>
+			</wsc:message>
+		</wsc:consume>
+	</flow>
+</mule>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="getHotelByLocation" doc:id="031cdaca-99e3-4482-a221-49b47f974784" >
+		<logger level="INFO" doc:name="Logger" doc:id="a014d42a-dba4-46ed-8cc9-2f8a5db8b782" />
+		<ee:transform doc:name="Transform Message" doc:id="ed332632-d8e7-4611-be57-2f04b081a449" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://www.tajhotels.com/hotels/
+---
+{
+	location: payload.body.ns0#getHotels.location
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<wsc:consume operation="getHotels" doc:name="Consume" doc:id="5180b534-4e7f-4ee3-b2ad-2e1b0854493c" config-ref="Web_Service_Consumer_Config">
+			<wsc:message>
+				<wsc:body ><![CDATA[#['<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:hot="http://www.tajhotels.com/hotels/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <hot:getHotels>
+        <location>' ++ payload.location ++ '</location>
+      </hot:getHotels>
+   </soapenv:Body>
+</soapenv:Envelope>']]]></wsc:body>
+			</wsc:message>
+		</wsc:consume>
+		<logger level="INFO" doc:name="Logger" doc:id="f902aa39-135d-4a04-9301-ee9aa89649db" />
+	</flow>
+</mule>
