@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>bdce1dbf-9c8a-46ea-ab6f-6dc502f719f0</groupId>
+  <artifactId>taj-group-hotel-process-api</artifactId>
+  <version>1.0.2</version>
+  <name>Taj Group Hotel Process API</name>
+  <properties>
+    <classifier>raml</classifier>
+    <main>taj-group-hotel-booking-api.raml</main>
+    <originalFormatVersion>1.0</originalFormatVersion>
+    <apiVersion>v1</apiVersion>
+    <projectId>0e48c12b-fd83-4006-8fbc-5aba49d92f12</projectId>
+    <branchId>master</branchId>
+    <commitId>2d60b4573efab1868484e8e0d72c788e279617e7</commitId>
+    <keywords/>
+    <type>rest-api</type>
+    <mainFile>taj-group-hotel-booking-api.raml</mainFile>
+  </properties>
+  <repositories>
+    <repository>
+      <id>anypoint-exchange</id>
+      <url>https://maven.anypoint.mulesoft.com/api/v3/maven</url>
+    </repository>
+  </repositories>
+</project>

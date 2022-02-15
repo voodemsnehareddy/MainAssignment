@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.tajhotels.com/hotels/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="hotels" targetNamespace="http://www.tajhotels.com/hotels/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://www.tajhotels.com/hotels/">
+      <xsd:element name="BookHotel">
+        <xsd:complexType>
+          <xsd:sequence>
+
+
+
+          	<xsd:element name="hotelType" type="tns:hotelType"></xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="BookHotelResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+          	<xsd:element name="status" type="xsd:string"></xsd:element>
+
+          	<xsd:element name="bookedId" type="xsd:int"></xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    
+      <xsd:complexType name="hotelType">
+      	<xsd:sequence>
+      		<xsd:element name="bookingId" type="xsd:int" maxOccurs="1" minOccurs="0"></xsd:element>
+      		<xsd:element name="hotelName" type="xsd:string"></xsd:element>
+      		<xsd:element name="location" type="xsd:string"></xsd:element>
+      		<xsd:element name="hotelDesc" type="xsd:string"></xsd:element>
+      		<xsd:element name="bookedDate" type="xsd:string"></xsd:element>
+      		<xsd:element name="room" type="tns:roomType"></xsd:element>
+
+      	</xsd:sequence>
+      </xsd:complexType>
+    
+      <xsd:complexType name="roomType">
+      	<xsd:sequence>
+
+      		<xsd:element name="roomNo" type="xsd:int"></xsd:element>
+      		<xsd:element name="price" type="xsd:double"></xsd:element>
+      		<xsd:element name="persons" type="xsd:int"></xsd:element>
+
+      	</xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="GetHotel">
+      	<xsd:complexType>
+      		<xsd:sequence>
+
+      			<xsd:element name="bookedId" type="xsd:int"></xsd:element>
+      		</xsd:sequence>
+      	</xsd:complexType>
+      </xsd:element>
+      <xsd:element name="GetHotelResponse">
+      	<xsd:complexType>
+      		<xsd:sequence>
+
+      			<xsd:element name="hotel" type="tns:hotelType"></xsd:element>
+      		</xsd:sequence>
+      	</xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="BookHotelRequest">
+    <wsdl:part element="tns:BookHotel" name="parameters"/>
+  </wsdl:message>
+  <wsdl:message name="BookHotelResponse">
+    <wsdl:part element="tns:BookHotelResponse" name="parameters"/>
+  </wsdl:message>
+  <wsdl:message name="GetHotelRequest">
+  	<wsdl:part name="parameters" element="tns:GetHotel"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetHotelResponse">
+  	<wsdl:part name="parameters" element="tns:GetHotelResponse"></wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="hotels">
+    <wsdl:operation name="BookHotel">
+      <wsdl:input message="tns:BookHotelRequest"/>
+      <wsdl:output message="tns:BookHotelResponse"/>
+    </wsdl:operation>
+    <wsdl:operation name="GetHotel">
+    	<wsdl:input message="tns:GetHotelRequest"></wsdl:input>
+    	<wsdl:output message="tns:GetHotelResponse"></wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="hotelsSOAP" type="tns:hotels">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="BookHotel">
+      <soap:operation soapAction="http://www.tajhotels.com/hotels/BookHotel"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetHotel">
+      <soap:operation soapAction="http://www.tajhotels.com/hotels/GetHotel"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="hotels">
+    <wsdl:port binding="tns:hotelsSOAP" name="hotelsSOAP">
+      <soap:address location="http://www.example.org/"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
