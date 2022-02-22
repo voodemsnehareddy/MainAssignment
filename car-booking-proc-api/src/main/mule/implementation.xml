@@ -10,14 +10,15 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 		<logger level="INFO" doc:name="Init Logger" doc:id="f11ed1b2-fcdd-4230-ab1b-ff75e17d62c0" message='#["postCustomerCar Flow Started"]'/>
 		<set-variable value='#[attributes.queryParams.provider default ""]' doc:name="providerVariable" doc:id="39133cde-6b79-4428-bcff-d0313ab27b43" variableName="provider"/>
 		<flow-ref doc:name="setValues" doc:id="66cd2842-c51c-4c59-8bb5-06c45de9a303" name="setValues" />
-		<http:request method="GET" doc:name="CarBookingSystemRequest" doc:id="1ddb420b-d111-4fe8-b0d2-affb40175361" config-ref="HTTP_Request_configuration" path="/api/cars/customer">
-			<http:headers ><![CDATA[#[output application/java
+		<try doc:name="Try" doc:id="6bb49e70-c91e-4b5b-8d9e-c39ffd8ab537" >
+			<http:request method="GET" doc:name="CarBookingSystemRequest" doc:id="1ddb420b-d111-4fe8-b0d2-affb40175361" config-ref="HTTP_Request_configuration" path="/api/cars/customer">
+			<http:headers><![CDATA[#[output application/java
 ---
 {
 	"client_secret" : "${request.client_secret}",
 	"client_id" : "${request.client_id}"
 }]]]></http:headers>
-			<http:query-params ><![CDATA[#[output application/java
+			<http:query-params><![CDATA[#[output application/java
 ---
 {
 	"source" : vars.source,
@@ -25,9 +26,9 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 	"destination" : vars.destination
 }]]]></http:query-params>
 		</http:request>
-		<ee:transform doc:name="Transform Message" doc:id="b923a7d2-e6e9-47d2-b909-8930aaaf13e2" >
-			<ee:message >
-				<ee:set-payload ><![CDATA[%dw 2.0
+			<ee:transform doc:name="Transform Message" doc:id="b923a7d2-e6e9-47d2-b909-8930aaaf13e2">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
 output application/json
 type currency=String{format: '.00'}
 var a = vars.provider
@@ -58,6 +59,21 @@ else
 filterResult()]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
+			<error-handler >
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="640763bb-9c70-44a3-86fb-a06b38c2128c" >
+					<ee:transform doc:name="Transform Message" doc:id="b058af37-25ca-44b5-8652-827f3e136705" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"status": "Communication Error.Please try again later"
+}]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+				</on-error-continue>
+			</error-handler>
+		</try>
 		<logger level="INFO" doc:name="Request Response" doc:id="bf1950a3-ab96-4b6d-8f52-b1e81db64845" message='#[payload]'/>
 		<choice doc:name="Check Provider" doc:id="b9b728b9-2753-434c-a222-e142b402ef68" >
 			<when expression='#[vars.provider=="OLA"]'>
@@ -193,6 +209,5 @@ output application/json
 		<set-variable value='#[payload.source default ""]' doc:name="sourceVariable" doc:id="261a5042-54e5-4a64-b2db-d57d4d3ebb11" variableName="source"/>
 		<set-variable value='#[payload.destination default ""]' doc:name="destinationVariable" doc:id="d54115dd-0668-44bd-90a2-651036c849e6" variableName="destination"/>
 		<set-variable value="#[payload]" doc:name="payloadVariable" doc:id="b36e846e-1e34-424d-bd1c-42e4edac1f25" variableName="payloadVar"/>
-	
-</sub-flow>
+	</sub-flow>
 </mule>
